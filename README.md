@@ -13,33 +13,9 @@ This template gives you a React 19 + Tailwind 4 + Express 4 + tRPC 11 stack with
 
 ---
 
-## Build Loop (Four Touch Points)
 
-1. Update schema in `drizzle/schema.ts`, then run `pnpm db:push`.
-2. Add database helpers in `server/db.ts` (return raw results).
-3. Add or extend procedures in `server/routers.ts`, then wire the UI with `trpc.*.useQuery/useMutation`.
-4. Build frontend experience according to `Frontend Workflow`
-5. Cover your changes with Vitest specs inside `server/*.test.ts` (see `server/auth.logout.test.ts`) and run `pnpm test`.
 
-That's it—no manual REST routes, no Axios client, no shared contract files.
 
----
-
-## Key Files
-
-```
-server/auth.logout.test.ts → Reference sample vitest test file
-drizzle/schema.ts → Database tables & types
-server/db.ts → Query helpers (reuse across procedures)
-server/routers.ts → tRPC procedures (auth + features)
-client/src/App.tsx → Routes wiring & layout shells
-client/src/lib/trpc.ts → tRPC client binding
-client/src/pages/ → Feature UI that calls trpc hooks
-```
-
-Framework plumbing (OAuth, context, Vite bridge) lives under `server/_core`.
-
----
 
 ## File Structure
 
@@ -89,24 +65,6 @@ Files in `client/public` are available at the root of your site—reference them
 
 ---
 
-## Environment Variables
-
-Available pre-defined system envs:
-- `DATABASE_URL`: MySQL/TiDB connection string
-- `JWT_SECRET`: Session cookie signing secret
-- `VITE_APP_ID`: Manus OAuth application ID
-- `OAUTH_SERVER_URL`: Manus OAuth backend base URL
-- `VITE_OAUTH_PORTAL_URL`: Manus login portal URL (frontend)
-- `OWNER_OPEN_ID`, `OWNER_NAME`: Owner's info
-- `BUILT_IN_FORGE_API_URL`: Manus built-in apis (includes llm, storage, data_api, notification, etc...)
-- `BUILT_IN_FORGE_API_KEY`: Bearer token used by Manus built-in apis (server-side)
-- `VITE_FRONTEND_FORGE_API_KEY`: Bearer token for frontend access to Manus built-in apis
-- `VITE_FRONTEND_FORGE_API_URL`: Manus built-in apis URL for frontend
-
-Do not edit these directly in code or commit `.env` files.
-The envs above are system envs, when use env in website code, refer `server/_core/env.ts` for available list.
-
----
 
 ## Frontend Workflow
 
@@ -166,22 +124,6 @@ When generating frontend UI, avoid generic patterns that lack visual distinction
 
 ---
 
-## Animation Guide
-
-Bake motion taste in from the first line of code. Snappy, physically intuitive interactions are not a polish pass — they are part of the initial build.
-- Decide whether to animate at all: keyboard-initiated actions (command palettes, shortcuts) must be instant — never animate them. High-frequency interactions (hover, list nav) should be minimal. Reserve richer motion for occasional events (modals, drawers, toasts) and rare delight moments (onboarding).
-- Keep UI animations under 300ms. A 180ms dropdown feels significantly better than a 400ms one. Typical ranges: button press 100–160ms, tooltips 125–200ms, dropdowns 150–250ms, modals/drawers 200–500ms.
-- Use strong custom easings, not the weak CSS defaults. Default to a snappy ease-out for entering/exiting UI: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1);`. For moving/morphing use `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);`. NEVER use `ease-in` for UI animations — it feels sluggish.
-- Buttons must feel responsive: add `transform: scale(0.97)` on `:active` with a ~160ms ease-out transition so the UI confirms it heard the user.
-- Never animate from `scale(0)` — nothing in the real world appears from nothing. Start from `scale(0.95)` combined with `opacity: 0`.
-- Origin-aware popovers/dropdowns: scale in from the trigger point (e.g. `transform-origin: var(--radix-popover-content-transform-origin)`). Modals are the exception and stay centered.
-- Prefer CSS transitions over @keyframes for dynamic UI state. Transitions can be interrupted and reversed smoothly mid-flight; keyframes restart from zero and feel broken when interrupted.
-- Only animate `transform` and `opacity` for motion — they run on the GPU and skip layout/paint. Avoid animating `width`, `height`, `padding`, `margin`, `top/left` unless absolutely necessary.
-- Stagger grouped entrances by 30–80ms per item to create a cascading reveal instead of a wall of motion.
-- Asymmetric timing for deliberate actions: hold-to-confirm should be slow and linear on press (e.g. 2s linear), but release/cancel should snap back fast (~200ms ease-out).
-- Respect `prefers-reduced-motion`: gate non-essential motion behind `@media (prefers-reduced-motion: no-preference)`.
-
----
 
 ## Feature Checklist
 
